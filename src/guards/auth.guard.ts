@@ -5,6 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { GqlExecutionContext } from "@nestjs/graphql";
 import * as KeycloakConnect from 'keycloak-connect';
 import { KEYCLOAK_INSTANCE, KEYCLOAK_CONNECT_OPTIONS } from '../constants';
 import { KeycloakConnectOptions } from '../interface/keycloak-connect-options.interface';
@@ -36,7 +37,11 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    let request = context.switchToHttp().getRequest();
+    if (!request) {
+      const ctx = GqlExecutionContext.create(context);
+      request = ctx.getContext().req;
+    }
     const jwt =
       this.extractJwtFromCookie(request.cookies) ??
       this.extractJwt(request.headers);
