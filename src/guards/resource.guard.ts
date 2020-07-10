@@ -64,8 +64,8 @@ export class ResourceGuard implements CanActivate {
     const permissions = scopes.map(scope => `${resource}:${scope}`);
 
     const [request, response] = [
-      context.switchToHttp().getRequest(),
-      context.switchToHttp().getResponse(),
+      this.getRequest(context),
+      this.getResponse(context),
     ];
 
     const user = request.user?.preferred_username ?? 'user';
@@ -82,6 +82,14 @@ export class ResourceGuard implements CanActivate {
 
     return isAllowed;
   }
+
+  getRequest<T = any>(context: ExecutionContext): T {
+    return context.switchToHttp().getRequest();
+  }
+
+  getResponse<T = any>(context: ExecutionContext): T {
+    return context.switchToHttp().getResponse();
+  }
 }
 
 const createEnforcerContext = (request: any, response: any) => (
@@ -97,3 +105,4 @@ const createEnforcerContext = (request: any, response: any) => (
       }
     }),
   );
+  

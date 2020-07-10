@@ -37,11 +37,8 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    let request = context.switchToHttp().getRequest();
-    if (!request) {
-      const ctx = GqlExecutionContext.create(context);
-      request = ctx.getContext().req;
-    }
+    const request = this.getRequest(context);
+    
     const jwt =
       this.extractJwtFromCookie(request.cookies) ??
       this.extractJwt(request.headers);
@@ -80,5 +77,9 @@ export class AuthGuard implements CanActivate {
 
   extractJwtFromCookie(cookies: { [key: string]: string }) {
     return cookies && cookies[this.keycloakOpts.cookieKey] || cookies && cookies.KEYCLOAK_JWT;
+  }
+
+  getRequest<T = any>(context: ExecutionContext): T {
+    return context.switchToHttp().getRequest();
   }
 }

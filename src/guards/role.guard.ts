@@ -38,7 +38,7 @@ export class RoleGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = this.getRequest(context);
     const { accessTokenJWT } = request;
 
     if (!accessTokenJWT) {
@@ -59,5 +59,9 @@ export class RoleGuard implements CanActivate {
       : roles.every(r => accessToken.hasRole(r));
 
     return isInRole;
+  }
+
+  getRequest<T = any>(context: ExecutionContext): T {
+    return context.switchToHttp().getRequest();
   }
 }
